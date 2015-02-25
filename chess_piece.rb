@@ -19,6 +19,10 @@ class Piece
 
   end
 
+  def move_into_check?(pos)
+    # if
+  end
+  
   def moved?
 
   end
@@ -59,37 +63,6 @@ class SlidingPiece < Piece
 
     def diag_moves
       get_moves(DIAG_DIRS)
-
-      # [].tap do |diag_arr|
-      #   pos_x, pos_y = x + 1, y + 1
-      #   while pos_x < 8 && pos_y < 8
-      #
-
-      # break if @board.piece_at(pos) && @board.piece_at(pos).color == @color
-      #     diag_arr << [pos_x, pos_y]
-      #     # break if @board.piece_at(pos) && @board.piece_at(pos).color != @color
-      #     pos_x += 1
-      #     pos_y += 1
-      #   end
-      #   pos_x, pos_y = x - 1, y - 1
-      #   while pos_x >= 0 && pos_y >= 0
-      #     diag_arr << [pos_x, pos_y]
-      #     pos_x -= 1
-      #     pos_y -= 1
-      #   end
-      #   pos_x, pos_y = x + 1, y - 1
-      #   while pos_x < 8 && pos_y >= 0
-      #     diag_arr << [pos_x, pos_y]
-      #     pos_x += 1
-      #     pos_y -= 1
-      #   end
-      #   pos_x, pos_y = x - 1, y + 1
-      #   while pos_x >= 0 && pos_y < 8
-      #     diag_arr << [pos_x, pos_y]
-      #     pos_x -= 1
-      #     pos_y += 1
-      #   end
-      # end
     end
 
     def get_moves(all_dirs)
@@ -118,7 +91,6 @@ class Rook < SlidingPiece
   def symbol
     @color == :black ? "\u265C".encode('utf-8') : "\u2656".encode('utf-8')
   end
-
 end
 
 class Bishop < SlidingPiece
@@ -162,7 +134,6 @@ class Knight < SteppingPiece
   def symbol
     @color == :black ? "\u265E".encode('utf-8') : "\u2658".encode('utf-8')
   end
-
 end
 
 class King < SteppingPiece
@@ -184,7 +155,6 @@ class King < SteppingPiece
       end
     end
   end
-
 end
 
 class Pawn < Piece

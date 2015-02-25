@@ -7,14 +7,22 @@ class Board
 
   def initialize
     @grid = Array.new(BOARD_SIZE) { Array.new(BOARD_SIZE) }
-    @white_king, @black_king = nil, nil
-    board_setup
-    @white_king = @grid[0][4]
-    @black_king = @grid[7][4]
+
+  end
+
+  def move_piece(piece, pos)
+    x, y = pos
+    old_x, old_y = piece.pos
+    @grid[old_x][old_y] = nil
+    @grid[x][y] = piece
   end
 
   def occupied?(pos)
     !!piece_at(pos)
+  end
+
+  def on_board?(pos)
+    pos.min >= 0 && pos.max < BOARD_SIZE
   end
 
   def piece_at(pos)
@@ -22,20 +30,16 @@ class Board
     @grid[x][y]
   end
 
-  def on_board?(pos)
-    pos.min >= 0 && pos.max < BOARD_SIZE
-  end
-
-  def in_check?(king_color)
-    king_color == :black ? king = @black_king : king = @white_king
-    @grid.flatten.each do |piece|
-      if piece && piece.color != king_color && piece.moves.include?(king.pos)
-        return true
-      end
-    end
-
-    false
-  end
+  # def in_check?(king_color)
+  #   king_color == :black ? king = @black_king : king = @white_king
+  #   @grid.flatten.each do |piece|
+  #     if piece && piece.color != king_color && piece.moves.include?(king.pos)
+  #       return true
+  #     end
+  #   end
+  #
+  #   false
+  # end
 
   def board_setup
     color, x = :black, 0
@@ -56,6 +60,16 @@ class Board
     nil
   end
 
+  def dup
+    board_copy = Board.new
+    @grid.flatten.compact.each do |piece|
+      x, y = piece.pos
+      board_copy[[x, y]] = piece.class.new(piece.color, piece.pos, board_copy)
+    end
+
+    board_copy
+  end
+
   def render
     @grid.each do |row|
       row.each do |space|
@@ -70,5 +84,11 @@ class Board
     end
 
     nil
+  end
+
+  protected
+
+  def []=(pos, piece)
+    @grid[pos.first][pos.last] = piece
   end
 end
