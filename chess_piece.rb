@@ -27,7 +27,7 @@ class Piece
     def attempt_move(new_pos)
       if @board.on_board?(new_pos)
         if @board.occupied?(new_pos)
-          @board.piece_at?(new_pos).color != @color ? 'eat' : 'invalid'
+          @board.piece_at(new_pos).color != @color ? 'eat' : 'invalid'
         else
           'empty'
         end
