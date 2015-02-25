@@ -53,56 +53,58 @@ class SlidingPiece < Piece
   end
 
   private
-    def straight_moves(pos = @pos)
-      # debugger
-      # return [] unless @board.on_board?(pos)
-      straight_arr = []
-      x, y = pos
-      # FOUR_DIRS = [0, ]
-      STRAIGHT_DIRS.each do |off_x, off_y|
-        new_pos = [off_x + x, off_y + y]
-        attempt_move_result = attempt_move(new_pos)
-        until attempt_move_result == 'invalid' || attempt_move_result == 'eat'
-          debugger
-          straight_arr << new_pos
-          new_pos[0] += off_x
-          new_pos[1] += off_y
-          attempt_move_result = attempt_move(new_pos)
-        end
-        straight_arr += new_pos if attempt_move_result == 'eat'
-      end
-
-      straight_arr
+    def straight_moves
+      get_moves(STRAIGHT_DIRS)
     end
 
     def diag_moves
+      get_moves(DIAG_DIRS)
+
+      # [].tap do |diag_arr|
+      #   pos_x, pos_y = x + 1, y + 1
+      #   while pos_x < 8 && pos_y < 8
+      #
+
+      # break if @board.piece_at(pos) && @board.piece_at(pos).color == @color
+      #     diag_arr << [pos_x, pos_y]
+      #     # break if @board.piece_at(pos) && @board.piece_at(pos).color != @color
+      #     pos_x += 1
+      #     pos_y += 1
+      #   end
+      #   pos_x, pos_y = x - 1, y - 1
+      #   while pos_x >= 0 && pos_y >= 0
+      #     diag_arr << [pos_x, pos_y]
+      #     pos_x -= 1
+      #     pos_y -= 1
+      #   end
+      #   pos_x, pos_y = x + 1, y - 1
+      #   while pos_x < 8 && pos_y >= 0
+      #     diag_arr << [pos_x, pos_y]
+      #     pos_x += 1
+      #     pos_y -= 1
+      #   end
+      #   pos_x, pos_y = x - 1, y + 1
+      #   while pos_x >= 0 && pos_y < 8
+      #     diag_arr << [pos_x, pos_y]
+      #     pos_x -= 1
+      #     pos_y += 1
+      #   end
+      # end
+    end
+
+    def get_moves(all_dirs)
       x, y = @pos
-      [].tap do |diag_arr|
-        pos_x, pos_y = x + 1, y + 1
-        while pos_x < 8 && pos_y < 8
-          # break if @board.piece_at(pos) && @board.piece_at(pos).color == @color
-          diag_arr << [pos_x, pos_y]
-          # break if @board.piece_at(pos) && @board.piece_at(pos).color != @color
-          pos_x += 1
-          pos_y += 1
-        end
-        pos_x, pos_y = x - 1, y - 1
-        while pos_x >= 0 && pos_y >= 0
-          diag_arr << [pos_x, pos_y]
-          pos_x -= 1
-          pos_y -= 1
-        end
-        pos_x, pos_y = x + 1, y - 1
-        while pos_x < 8 && pos_y >= 0
-          diag_arr << [pos_x, pos_y]
-          pos_x += 1
-          pos_y -= 1
-        end
-        pos_x, pos_y = x - 1, y + 1
-        while pos_x >= 0 && pos_y < 8
-          diag_arr << [pos_x, pos_y]
-          pos_x -= 1
-          pos_y += 1
+      [].tap do |moves|
+        all_dirs.each do |off_x, off_y|
+          new_pos = [off_x + x, off_y + y]
+          attempt_move_result = attempt_move(new_pos)
+          until attempt_move_result == 'invalid' || attempt_move_result == 'eat'
+            moves << [new_pos[0], new_pos[1]]
+            new_pos[0] += off_x
+            new_pos[1] += off_y
+            attempt_move_result = attempt_move(new_pos)
+          end
+          moves << new_pos if attempt_move_result == 'eat'
         end
       end
     end
