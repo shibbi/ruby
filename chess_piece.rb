@@ -1,13 +1,12 @@
-require 'byebug'
-
 class Piece
   STRAIGHT_DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]]
   DIAG_DIRS     = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
   KNIGHT_DIRS   = [[-1, 2], [-1, -2], [1, 2], [1, -2],
                    [-2, 1], [-2, -1], [2, 1], [2, -1]]
-  PAWN_DIRS     = [[0, 1], [0, 2], [-1, 1], [1, 1]]
+  PAWN_DIRS     = [[1, 0], [1, 1], [1, -1]]
 
-  attr_reader :pos, :color
+  attr_reader :color
+  attr_accessor :pos
 
   def initialize(color, pos, board)
     @color = color
@@ -15,16 +14,14 @@ class Piece
     @board = board
   end
 
-  def valid_moves()
-
+  def valid_moves
+    moves.reject { |pos| move_into_check?(pos) }
   end
 
-  def move_into_check?(pos)
-    # if
-  end
-  
-  def moved?
-
+  def move_into_check?(new_pos)
+    duped_board = @board.dup
+    duped_board.move_piece(duped_board.piece_at(self.pos), new_pos)
+    duped_board.in_check?(color)
   end
 
   protected
@@ -144,20 +141,52 @@ class King < SteppingPiece
   def symbol
     @color == :black ? "\u265A".encode('utf-8') : "\u2654".encode('utf-8')
   end
+  #
+  # def moves
+  #   [].tap do |possible_moves|
+  #     (STRAIGHT_DIRS + DIAG_DIRS).each do |direction|
+  #       new_pos = [@pos[0] + direction[0], @pos[1] + direction[1]]
+  #       if attempt_move(new_pos) == 'empty' || attempt_move(new_pos) == 'eat'
+  #         possible_moves << new_pos
+  #       end
+  #     end
+  #   end
+  # end
+end
 
+class Pawn < Piece
   def moves
-    [].tap do |possible_moves|
-      (STRAIGHT_DIRS + DIAG_DIRS).each do |direction|
-        new_pos = [@pos[0] + direction[0], @pos[1] + direction[1]]
-        if attempt_move(new_pos) == 'empty' || attempt_move(new_pos) == 'eat'
+    x, y = @pos
+    possible_moves = []
+    if color == :black
+      if x == 1
+        new_x = x + 2
+        possible_moves << [new_x, y] if attempt_move([new_x, y]) == 'empty'
+      end
+      PAWN_DIRS.each do |dir|
+        new_pos = [x + dir[0], y + dir[1]]
+        if attempt_move(new_pos) == 'empty' && !DIAG_DIRS.include?(dir) ||
+           attempt_move(new_pos) == 'eat' && !STRAIGHT_DIRS.include?(dir)
+          possible_moves << new_pos
+        end
+      end
+    elsif color == :white
+      if x == 6
+        new_x = x - 2
+        possible_moves << [new_x, y] if attempt_move([new_x, y]) == 'empty'
+      end
+      PAWN_DIRS.each do |dir|
+        new_pos = [x - dir[0], y - dir[1]]
+        if attempt_move(new_pos) == 'empty' && !DIAG_DIRS.include?(dir) ||
+           attempt_move(new_pos) == 'eat' && !STRAIGHT_DIRS.include?(dir)
           possible_moves << new_pos
         end
       end
     end
-  end
-end
 
-class Pawn < Piece
+    possible_moves
+  end
+
   def symbol
     @color == :black ? "\u265F".encode('utf-8') : "\u2659".encode('utf-8')
   end

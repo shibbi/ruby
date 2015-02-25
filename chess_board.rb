@@ -7,14 +7,14 @@ class Board
 
   def initialize
     @grid = Array.new(BOARD_SIZE) { Array.new(BOARD_SIZE) }
-
   end
 
-  def move_piece(piece, pos)
-    x, y = pos
+  def move_piece(piece, new_pos)
+    x, y = new_pos
     old_x, old_y = piece.pos
     @grid[old_x][old_y] = nil
     @grid[x][y] = piece
+    piece.pos = new_pos
   end
 
   def occupied?(pos)
@@ -30,16 +30,28 @@ class Board
     @grid[x][y]
   end
 
-  # def in_check?(king_color)
-  #   king_color == :black ? king = @black_king : king = @white_king
-  #   @grid.flatten.each do |piece|
-  #     if piece && piece.color != king_color && piece.moves.include?(king.pos)
-  #       return true
-  #     end
-  #   end
-  #
-  #   false
-  # end
+  def in_check?(king_color)
+    king = color_pieces(king_color).find { |piece| piece.class == King }
+    @grid.flatten.each do |piece|
+      if piece && piece.color != king_color && piece.moves.include?(king.pos)
+        return true
+      end
+    end
+
+    false
+  end
+
+  def checkmate?(king_color)
+    no_valid_moves = color_pieces(king_color).all? do |piece|
+      piece.valid_moves.empty?
+    end
+
+    in_check?(king_color) && no_valid_moves
+  end
+
+  def color_pieces(color)
+    @grid.flatten.compact.select { |piece| piece.color == color }
+  end
 
   def board_setup
     color, x = :black, 0
@@ -71,16 +83,18 @@ class Board
   end
 
   def render
-    @grid.each do |row|
-      row.each do |space|
-        if space.nil?
-          print '|__|'
+    puts "   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |"
+    @grid.each_index do |row|
+      print " #{row} |"
+      @grid[row].each_index do |space|
+        print '|'
+        if @grid[row][space].nil?
+          print '__|'
         else
-          print "|#{space.symbol} |"
+          print "|#{@grid[row][space].symbol} |"
         end
       end
       puts ''
-      # puts '----' * BOARD_SIZE
     end
 
     nil
