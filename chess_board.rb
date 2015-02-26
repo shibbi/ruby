@@ -1,3 +1,5 @@
+require 'colorize'
+
 class LocationError < ArgumentError
 end
 
@@ -103,17 +105,28 @@ class Board
   end
 
   def render
-    puts "   | a | b | c | d | e | f | g | h |"
+    puts "    a  b  c  d  e  f  g  h "
+    pink = true
     @grid.each_index do |row|
-      print " #{BOARD_SIZE - row} |"
+      print " #{BOARD_SIZE - row} "
       @grid[row].each_index do |space|
         if @grid[row][space].nil?
-          print '|__|'
+          if pink
+            print pink_bg('   ')
+          else
+            print cyan_bg('   ')
+          end
         else
-          print "|#{@grid[row][space].symbol} |"
+          if pink
+            print pink_bg(" #{@grid[row][space].symbol} ")
+          else
+            print cyan_bg(" #{@grid[row][space].symbol} ")
+          end
         end
+        pink = !pink
       end
       puts ''
+      pink = !pink
     end
 
     nil
@@ -124,4 +137,14 @@ class Board
   def []=(pos, piece)
     @grid[pos.first][pos.last] = piece
   end
+
+  def pink_bg(str)
+    str.colorize(:background => :light_magenta)
+  end
+
+  def cyan_bg(str)
+    str.colorize(:background => :cyan)
+  end
+
+
 end
