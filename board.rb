@@ -1,7 +1,15 @@
+require_relative 'piece'
+
 class LocationError < ArgumentError
 end
 
 class NoPieceError < ArgumentError
+end
+
+class PlayerError < ArgumentError
+end
+
+class SameSpaceError <ArgumentError
 end
 
 class InCheckError < ArgumentError
@@ -29,16 +37,18 @@ class Board
     @grid[new_x][new_y].pos = new_pos
   end
 
-  def move(old_pos, new_pos)
-    raise LocationError unless on_board?(new_pos)
-    raise NoPieceError if piece_at(old_pos).nil?
-    raise InCheckError if piece_at(old_pos).move_into_check?(new_pos)
-    raise OtherMoveError unless piece_at(old_pos).valid_moves.include?(new_pos)
-    move_piece(old_pos, new_pos)
+  def move(player, pos1, pos2)
+    fail LocationError unless on_board?(pos2)
+    fail NoPieceError if piece_at(pos1).nil?
+    fail PlayerError if player.color != piece_at(pos1).color
+    fail SameSpaceError if pos1 == pos2
+    fail InCheckError if piece_at(pos1).move_into_check?(pos2)
+    fail OtherMoveErro unless piece_at(pos1).valid_moves.include?(pos2)
+    move_piece(pos1, pos2)
   end
 
   def occupied?(pos)
-    !!piece_at(pos)
+    piece_at(pos).nil? ? false : true
   end
 
   def on_board?(pos)
@@ -103,29 +113,25 @@ class Board
   end
 
   def render
-    puts "    a  b  c  d  e  f  g  h "
+    system 'clear'
+    puts '    a  b  c  d  e  f  g  h '
     pink = true
     @grid.each_index do |row|
       print " #{BOARD_SIZE - row} "
       @grid[row].each_index do |space|
         if @grid[row][space].nil?
-          if pink
-            print pink_bg('   ')
-          else
-            print cyan_bg('   ')
-          end
+          bg = pink ? pink_bg('   ') : cyan_bg('   ')
         else
-          if pink
-            print pink_bg(" #{@grid[row][space].symbol} ")
-          else
-            print cyan_bg(" #{@grid[row][space].symbol} ")
-          end
+          symbol = @grid[row][space].symbol
+          bg = pink ? pink_bg(" #{symbol} ") : cyan_bg(" #{symbol} ")
         end
+        print bg
         pink = !pink
       end
       puts ''
       pink = !pink
     end
+    puts ''
 
     nil
   end

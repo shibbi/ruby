@@ -1,3 +1,7 @@
+require_relative 'pieces/sliding.rb'
+require_relative 'pieces/stepping.rb'
+require_relative 'pieces/pawn.rb'
+
 class Piece
   STRAIGHT_DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]]
   DIAG_DIRS     = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
@@ -42,6 +46,7 @@ class Piece
     end
 
     def symbol_encode(color, unicode)
-      unicode.encode('utf-8').colorize(color)
+      color == :black ? new_color = :black : new_color = :light_white
+      unicode.encode('utf-8').colorize(new_color)
     end
 end

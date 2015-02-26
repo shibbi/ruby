@@ -1,36 +1,26 @@
 require 'colorize'
+
+# require_relative 'keypress'
+
 require_relative 'board'
 require_relative 'player'
-require_relative 'piece'
-require_relative 'pieces/sliding.rb'
-require_relative 'pieces/stepping.rb'
-require_relative 'pieces/pawn.rb'
 
 class Game
   def initialize(player1 = HumanPlayer.new(:black, "Chris"), player2 = HumanPlayer.new(:white, "Shibo"))
     @player1, @player2 = player1, player2
+    @board = Board.new
+    @board.board_setup
   end
 
   def play
-    @board = Board.new
-    @board.board_setup
     player = @player1.color == :white ? @player1 : @player2
     until @board.checkmate?(player.color)
-      puts "It's now #{player.name}'s (#{player.color}) turn!"
       @board.render
-      begin
-        player.play_turn(@board)
-      rescue PlayerError
-        puts "You can't move a piece that doesn't belong to you :("
-        retry
-      rescue NoPieceError
-        puts "Can't move a nonexistent piece; try again"
-        retry
-      end
+      puts "It's now #{player.name}'s (#{player.color}) turn!"
+      player.play_turn(@board)
       player = toggle_player(player)
     end
-    loser = player.name
-    winner = toggle_player(player).name
+    loser, winner = player.name, toggle_player(player).name
     puts "Game Over! #{winner} won and #{loser} lost!"
   end
 
