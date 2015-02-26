@@ -1,6 +1,6 @@
-require_relative 'chess_board'
-require_relative 'chess_piece'
-require_relative 'chess_player'
+require_relative 'board'
+require_relative 'piece'
+require_relative 'player'
 
 class Game
   def initialize(player1 = HumanPlayer.new(:black, "Chris"), player2 = HumanPlayer.new(:white, "Shibo"))
