@@ -10,7 +10,7 @@ class Game
   def play
     @board = Board.new
     @board.board_setup
-    player = @player1.color == :black ? @player1 : @player2
+    player = @player1.color == :white ? @player1 : @player2
     until @board.checkmate?(player.color)
       puts "It's now #{player.name}'s (#{player.color}) turn!"
       @board.render
@@ -37,7 +37,12 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  # puts "Running from this file"
-  # g = Game.new
-  # g.play
+  if ARGV.length == 2
+    player1 = HumanPlayer.new(:white, ARGV.shift)
+    player2 = HumanPlayer.new(:black, ARGV.shift)
+    g = Game.new(player1, player2)
+  else
+    g = Game.new
+  end
+  g.play
 end
