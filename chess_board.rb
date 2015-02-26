@@ -1,3 +1,15 @@
+class LocationError < ArgumentError
+end
+
+class NoPieceError < ArgumentError
+end
+
+class InCheckError < ArgumentError
+end
+
+class OtherMoveError < ArgumentError
+end
+
 class Board
 
   BOARD_SIZE = 8
@@ -9,12 +21,20 @@ class Board
     @grid = Array.new(BOARD_SIZE) { Array.new(BOARD_SIZE) }
   end
 
-  def move_piece(piece, new_pos)
-    x, y = new_pos
-    old_x, old_y = piece.pos
+  def move_piece(old_pos, new_pos)
+    old_x, old_y = old_pos
+    new_x, new_y = new_pos
+    @grid[new_x][new_y] = @grid[old_x][old_y].dup
     @grid[old_x][old_y] = nil
-    @grid[x][y] = piece
-    piece.pos = new_pos
+    @grid[new_x][new_y].pos = new_pos
+  end
+
+  def move(old_pos, new_pos)
+    raise LocationError unless on_board?(new_pos)
+    raise NoPieceError if piece_at(old_pos).nil?
+    raise InCheckError if piece_at(old_pos).move_into_check?(new_pos)
+    raise OtherMoveError unless piece_at(old_pos).valid_moves.include?(new_pos)
+    move_piece(old_pos, new_pos)
   end
 
   def occupied?(pos)
@@ -76,20 +96,19 @@ class Board
     board_copy = Board.new
     @grid.flatten.compact.each do |piece|
       x, y = piece.pos
-      board_copy[[x, y]] = piece.class.new(piece.color, piece.pos, board_copy)
+      board_copy[[x, y]] = piece.dup
     end
 
     board_copy
   end
 
   def render
-    puts "   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |"
+    puts "   | a | b | c | d | e | f | g | h |"
     @grid.each_index do |row|
-      print " #{row} |"
+      print " #{BOARD_SIZE - row} |"
       @grid[row].each_index do |space|
-        print '|'
         if @grid[row][space].nil?
-          print '__|'
+          print '|__|'
         else
           print "|#{@grid[row][space].symbol} |"
         end
