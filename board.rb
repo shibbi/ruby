@@ -1,5 +1,3 @@
-require 'colorize'
-
 class LocationError < ArgumentError
 end
 

@@ -1,6 +1,10 @@
+require 'colorize'
 require_relative 'board'
-require_relative 'piece'
 require_relative 'player'
+require_relative 'piece'
+require_relative 'pieces/sliding.rb'
+require_relative 'pieces/stepping.rb'
+require_relative 'pieces/pawn.rb'
 
 class Game
   def initialize(player1 = HumanPlayer.new(:black, "Chris"), player2 = HumanPlayer.new(:white, "Shibo"))
