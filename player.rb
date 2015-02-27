@@ -1,14 +1,5 @@
 require 'byebug'
 
-class InputError < ArgumentError
-end
-
-class SameSpaceError < ArgumentError
-end
-
-class PlayerError < ArgumentError
-end
-
 class HumanPlayer
   POS_X = { '8' => 0, '7' => 1, '6' => 2, '5' => 3,
             '4' => 4, '3' => 5, '2' => 6, '1' => 7 }
@@ -48,11 +39,8 @@ class HumanPlayer
     to.each do |to_pos|
       to_positions << [POS_X[to_pos[1]], POS_Y[to_pos[0]]]
     end
-    raise SameSpaceError if from_position == to_positions.first
     # debugger
     board.attempt_move(self, from_position, to_positions)
-    # board[from_position].perform_moves(to_positions)
-    # raise PlayerError if color != board[from_position].color
   end
 
   def get_input(prompt)

@@ -1,12 +1,8 @@
-class NoMoveError < StandardError
-end
-
-class InvalidMoveError < StandardError
-end
-
 class Piece
-  DOWN_DIRS = [[1, 1], [1, -1], [2, 2], [2, -2]]
-  UP_DIRS   = [[-1, 1], [-1, -1], [-2, 2], [-2, -2]]
+  DOWN_DIRS = { slide: [[1, 1], [1, -1]],
+                jump: [[2, 2], [2, -2]] }
+  UP_DIRS   = { slide: [[-1, 1], [-1, -1]],
+                jump: [[-2, 2], [-2, -2]] }
 
   # PIECE_UNICODE = { black: "\u26AB", white: "\u26AA" }
   PIECE_UNICODE = { black: "\u25C9", red: "\u25C9" }
@@ -22,13 +18,12 @@ class Piece
     self.king = king
   end
 
-  def move_dirs
+  def move_dirs(type)
     if king
-      all_dirs = DOWN_DIRS + UP_DIRS
+      all_dirs = DOWN_DIRS[type] + UP_DIRS[type]
     else
-      all_dirs = color == :red ? DOWN_DIRS : UP_DIRS
+      all_dirs = color == :red ? DOWN_DIRS[type] : UP_DIRS[type]
     end
-
     all_pos = all_dirs.map { |dir| get_end_position(dir) }
 
     all_pos.select { |dir| board.on_board?(dir) }
@@ -40,7 +35,7 @@ class Piece
   end
 
   def perform_slide(end_pos)
-    return false unless move_dirs.include?(end_pos)
+    return false unless move_dirs(:slide).include?(end_pos)
     return false if board[end_pos]
 
     board.move!(pos, end_pos)
@@ -49,7 +44,7 @@ class Piece
   end
 
   def perform_jump(end_pos)
-    return false unless move_dirs.include?(end_pos)
+    return false unless move_dirs(:jump).include?(end_pos)
 
     jumped_piece = board[get_jumped_pos(end_pos)]
     if jumped_piece.nil? || jumped_piece.color == color
@@ -76,8 +71,6 @@ class Piece
     new_piece = new_board[pos]
     begin
       new_piece.perform_moves!(moves)
-    rescue NoMoveError
-      return false
     rescue InvalidMoveError
       return false
     end
@@ -87,9 +80,12 @@ class Piece
 
   def perform_moves!(moves)
     raise NoMoveError if moves.empty?
+    # debugger
 
     if moves.length == 1
-      raise InvalidMoveError unless perform_slide(moves.first)
+      slide = perform_slide(moves.first)
+      return true if slide
+      raise InvalidMoveError unless perform_jump(moves.first)
     else
       moves.each do |move|
         raise InvalidMoveError unless perform_jump(move)

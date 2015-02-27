@@ -1,15 +1,6 @@
 require 'colorize'
 require_relative 'piece'
 
-class BoundaryError < StandardError
-end
-
-class ExistingPieceError < StandardError
-end
-
-class NoPieceError < StandardError
-end
-
 class Board
   BOARD_SIZE = 8
 
@@ -61,6 +52,7 @@ class Board
   def attempt_move(player, from_position, to_positions)
     raise NoPieceError unless self[from_position]
     raise PlayerError if player.color != self[from_position].color
+    raise SameSpaceError if from_position == to_positions.first
     self[from_position].perform_moves(to_positions)
   end
 

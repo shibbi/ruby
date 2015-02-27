@@ -1,9 +1,14 @@
+# issues
+# not deleting pieces properly
+# not throwing errors when trying to move to slide into space with piece
+# not killing game when no pieces left or no moves left
+
+require 'byebug'
 require 'colorize'
-
 # require_relative 'keypress'
-
 require_relative 'board'
 require_relative 'player'
+require_relative 'errors'
 
 class Game
 
