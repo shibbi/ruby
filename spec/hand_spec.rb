@@ -70,6 +70,16 @@ RSpec.describe Hand do
                                     Card.new(:hearts, 6),
                                     Card.new(:clubs, 7),
                                     Card.new(:hearts, 4)]) }
+    let(:singles1)      { Hand.new([Card.new(:hearts, 13),
+                                    Card.new(:hearts, 12)
+                                    Card.new(:hearts, 11)
+                                    Card.new(:hearts, 10)
+                                    Card.new(:diamonds, 13)])}
+    let(:singles2)      { Hand.new([Card.new(:spades, 13),
+                                    Card.new(:spades, 12)
+                                    Card.new(:spades, 11)
+                                    Card.new(:spades, 10)
+                                    Card.new(:diamonds, 9)])}
 
     it "allows a straight flush to win against a full house" do
       expect(flush_hand.compare(full_hand)).to eq(1)
@@ -83,6 +93,10 @@ RSpec.describe Hand do
       expect(pair_kings.compare(pair_kings2)).to eq(1)
     end
 
+    it "compares singles correctly" do
+      expect(singles1.compare(singles2)).to eq(1)
+    end
+    
     it "calls a tie when two players have same hand rankings" do
       expect(flush_hand.compare(flush_hand)).to eq(0)
     end

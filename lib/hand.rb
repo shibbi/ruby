@@ -126,7 +126,11 @@ class Hand
         end
       end
     else
-
+      # singles
+      # singles = cards.sort.reverse
+      # singles2 = other_h.sort.reverse
+      # singles.each_index do |index|
+      #   singles[index]
     end
   end
 
