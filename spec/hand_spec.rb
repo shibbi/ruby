@@ -18,6 +18,29 @@ RSpec.describe Hand do
     end
   end
 
+  describe "#discard" do
+    let(:bad_hand) { Hand.new([Card.new(:diamonds, 4)]) }
+
+    it "discards cards form the hand" do
+      bad_card = bad_hand.cards.first
+      bad_hand.discard(bad_card)
+      expect(bad_hand.cards.index(bad_card)).to eq(nil)
+    end
+
+    it "does not allow discarding a card not in hand" do
+      card = Card.new(:spades, 7)
+      expect do
+        bad_hand.discard(card)
+      end.to raise_error(RuntimeError, 'card not found')
+    end
+
+    it "cannot discard from an empty hand" do
+      expect do
+        hand.discard(:card)
+      end.to raise_error(RuntimeError, 'empty hand')
+    end
+  end
+
   describe "#compare" do
     let(:straight_flush) { [Card.new(:clubs, 11),
                             Card.new(:clubs, 10),
@@ -25,7 +48,7 @@ RSpec.describe Hand do
                             Card.new(:clubs, 8),
                             Card.new(:clubs, 7)] }
     let(:full_house)    { [Card.new(:hearts, 5),
-                           Card.new(:spades, 5)
+                           Card.new(:spades, 5),
                            Card.new(:diamonds, 5),
                            Card.new(:spades, 8),
                            Card.new(:hearts, 8)] }
@@ -35,7 +58,7 @@ RSpec.describe Hand do
                                     Card.new(:spades, 13),
                                     Card.new(:hearts, 9),
                                     Card.new(:clubs, 8),
-                                    Card.new(:hearts, 11)] }
+                                    Card.new(:hearts, 11)]) }
     let(:pair_deuces)   { Hand.new([Card.new(:diamonds, 2),
                                     Card.new(:hearts, 2),
                                     Card.new(:hearts, 12),
@@ -45,7 +68,7 @@ RSpec.describe Hand do
                                     Card.new(:diamonds, 13),
                                     Card.new(:hearts, 6),
                                     Card.new(:clubs, 7),
-                                    Card.new(:hearts, 4)] }
+                                    Card.new(:hearts, 4)]) }
 
     it "allows a straight flush to win against a full house" do
       expect(flush_hand.compare(full_hand)).to eq(1)

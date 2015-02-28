@@ -9,4 +9,8 @@ class Card
     @suit = suit
     @value = value
   end
+
+  def ==(other_card)
+    suit == other_card.suit && value == other_card.value
+  end
 end
