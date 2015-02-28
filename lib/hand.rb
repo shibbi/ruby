@@ -113,7 +113,6 @@ class Hand
       if pair != pair2
         pair <=> pair2
       else
-        debugger
         singles = (value_counts.select { |key, val| val == 1 }).keys
         singles2 = (other_h.value_counts.select { |key, val| val == 1 }).keys
         values = singles.sort.reverse
@@ -127,7 +126,7 @@ class Hand
         end
       end
     else
-      
+
     end
   end
 
