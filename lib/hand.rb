@@ -2,16 +2,6 @@ require 'byebug'
 require_relative 'deck'
 
 class Hand
-  HAND_VALUES = {
-    straight_flush:  7,
-    four_of_a_kind:  6,
-    full_house:      5,
-    flush:           4,
-    straight:        3,
-    three_of_a_kind: 2,
-    one_pair:        1,
-    high_card:       0
-  }
 
   attr_reader :cards
 
@@ -53,7 +43,11 @@ class Hand
 
   def compare(other_hand)
     other_value = other_hand.value
-    value == other_value ? tie_breaking(other_hand) : value <=> other_value
+    if value == other_value
+      tie_breaking(other_hand)
+    else
+      value <=> other_value
+    end
   end
 
   def value_counts
@@ -67,71 +61,68 @@ class Hand
   end
 
   def sort
-    cards.sort_by { |card| card.value }
+    cards.sort_by(&:value)
   end
 
   private
 
   def tie_breaking(other_h)
+    card, other_card = nil, nil
     case value
-    when 8
-      sort.last <=> other_h.sort.last
-    when 7
-      key = (cards - cards.uniq).first
-      other_key = (other_h.cards - other_h.cards.uniq).first
-      key <=> other_key
+    when 8, 5, 4
+      card, other_card = sort.last, other_h.sort.last
+    when 7, 3
+      card = (cards - cards.uniq).first
+      other_card = (other_h.cards - other_h.cards.uniq).first
     when 6
-      key = (value_counts.find { |key, val| val == 3 }).first
-      other_key = (other_h.value_counts.find { |key, val| val == 3 }).first
-      key <=> other_key
-    when 5
-      sort.last <=> other_h.sort.last
-    when 4
-      sort.last <=> other_h.sort.last
-    when 3
-      key = (cards - cards.uniq).first
-      other_key = (other_h.cards - other_h.cards.uniq).first
-      key <=> other_key
+      card = (value_counts.find { |key, val| val == 3 }).first
+      other_card = (other_h.value_counts.find { |key, val| val == 3 }).first
     when 2
       pairs = (value_counts.select { |key, val| val == 2 }).keys
       pairs2 = (other_h.value_counts.select { |key, val| val == 2 }).keys
       values = pairs.sort.reverse
       values2 = pairs2.sort.reverse
-
       if values.first != values2.first
-        values.first <=> values2.first
+        card, other_card = values.first, values2.first
       elsif values.last != values2.last
-        values.last <=> values2.last
+        card, other_card = values.last, values2.last
       else
-        single = value_counts.find { |key, val| val == 1 }
-        other_single = other_h.value_counts.find { |key, val| val == 1 }
-        single.first <=> other_single.first
+        card = value_counts.find { |key, val| val == 1 }
+        other_card = other_h.value_counts.find { |key, val| val == 1 }
       end
     when 1
       pair = (value_counts.find { |key, val| val == 2 }).first
       pair2 = (other_h.value_counts.find { |key, val| val == 2 }).first
       if pair != pair2
-        pair <=> pair2
+        card, other_card = pair, pair2
       else
         singles = (value_counts.select { |key, val| val == 1 }).keys
         singles2 = (other_h.value_counts.select { |key, val| val == 1 }).keys
         values = singles.sort.reverse
         values2 = singles2.sort.reverse
         if values.first != values2.first
-          values.first <=> values2.first
+          card, other_card = values.first, values2.first
         elsif values[1] != values2[1]
-          values[1] <=> values2[1]
+          card, other_card = values[1], values2[1]
         else
-          values.last <=> values2.last
+          card, other_card = values.last, values2.last
         end
       end
     else
-      # singles
-      # singles = cards.sort.reverse
-      # singles2 = other_h.sort.reverse
-      # singles.each_index do |index|
-      #   singles[index]
+      singles = cards.sort.reverse
+      singles2 = other_h.sort.reverse
+      (0...singles.length).each do |index|
+        single, other_single = singles[index], singles2[index]
+        debugger
+        if single != other_single
+          card, other_card = single, other_single
+          break
+        end
+      end
+      return 0
     end
+
+    card <=> other_card
   end
 
   def straight_flush?
