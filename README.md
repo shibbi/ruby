@@ -1,4 +1,6 @@
-# README
+# Active Record Lite!
+
+## Description
 
 This is a project that simulates the behavior of ActiveRecord in Rails.
 
