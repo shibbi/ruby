@@ -1,4 +1,7 @@
 require_relative 'piece'
+require_relative 'pieces/sliding.rb'
+require_relative 'pieces/stepping.rb'
+require_relative 'pieces/pawn.rb'
 
 class LocationError < ArgumentError
 end
@@ -40,7 +43,7 @@ class Board
     fail PlayerError if player.color != piece_at(pos1).color
     fail SameSpaceError if pos1 == pos2
     fail InCheckError if piece_at(pos1).move_into_check?(pos2)
-    fail OtherMoveErro unless piece_at(pos1).valid_moves.include?(pos2)
+    fail OtherMoveError unless piece_at(pos1).valid_moves.include?(pos2)
     move_piece(pos1, pos2)
   end
 

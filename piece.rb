@@ -1,7 +1,3 @@
-require_relative 'pieces/sliding.rb'
-require_relative 'pieces/stepping.rb'
-require_relative 'pieces/pawn.rb'
-
 class Piece
   STRAIGHT_DIRS = [[-1, 0], [1, 0], [0, -1], [0, 1]]
   DIAG_DIRS     = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
