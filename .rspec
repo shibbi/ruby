@@ -1,2 +1,9 @@
+<<<<<<< HEAD
 --color
 --format documentation
+=======
+--format documentation
+--color
+--require spec_helper
+--order=default
+>>>>>>> 602339bc6b3d3d8a2fd13c41da721c430960f414
